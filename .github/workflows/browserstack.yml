@@ -26,5 +26,5 @@ jobs:
             -e BROWSERSTACK_USERNAME \
             -e BROWSERSTACK_ACCESS_KEY \
             -e BROWSERSTACK_APP_ANDROID \
-            wdio-bs-runner \
+            wdio-runner \
             ./src/config/wdio.browserstack.conf.ts
