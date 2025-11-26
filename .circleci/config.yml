@@ -1,13 +1,13 @@
 version: 2.1
 
 jobs:
-  build:
+  wdio-browserstack:
     machine: true   # Necesario para usar docker build/run
     working_directory: ~/repo
 
     steps:
       - checkout
-      
+
       - run:
           name: Build Docker image for WebdriverIO
           command: docker build -t wdio-runner .
