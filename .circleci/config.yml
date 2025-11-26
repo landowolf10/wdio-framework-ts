@@ -1,0 +1,35 @@
+version: 2.1
+
+jobs:
+  wdio-browserstack:
+    docker:
+      - image: cimg/base:stable
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Docker client
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+
+      - run:
+          name: Build Docker image for WebdriverIO
+          command: docker build -t wdio-runner .
+
+      - run:
+          name: Run WebdriverIO tests on BrowserStack
+          command: |
+            docker run --rm \
+              -e BROWSERSTACK_USERNAME="${BROWSERSTACK_USERNAME}" \
+              -e BROWSERSTACK_ACCESS_KEY="${BROWSERSTACK_ACCESS_KEY}" \
+              -e BROWSERSTACK_APP_ANDROID="${BROWSERSTACK_APP_ANDROID}" \
+              wdio-runner \
+              ./src/config/wdio.browserstack.conf.ts
+
+workflows:
+  version: 2
+  wdio_test_workflow:
+    jobs:
+      - wdio-browserstack

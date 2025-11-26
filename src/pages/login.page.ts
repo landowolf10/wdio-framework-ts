@@ -9,13 +9,13 @@ class LoginPage extends BasePage {
     }
 
     public async writeCredentials (username: string, password: string) {
-        await this.safeClick(loginLocators.loginOption);
-        await this.safeSetValue(loginLocators.inputUsername, username);
-        await this.safeSetValue(loginLocators.inputPassword, password);
+        await this.clickElement(loginLocators.loginOption);
+        await this.setValue(loginLocators.inputUsername, username);
+        await this.setValue(loginLocators.inputPassword, password);
     }
 
     public async pressLoginButton () {
-        await this.safeClick(loginLocators.submitButton);
+        await this.clickElement(loginLocators.submitButton);
     }
 
     public async getLoginModalText() {
