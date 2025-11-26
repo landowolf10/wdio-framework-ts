@@ -1,19 +1,13 @@
 version: 2.1
 
 jobs:
-  wdio-browserstack:
-    docker:
-      - image: cimg/base:stable
+  build:
+    machine: true   # Necesario para usar docker build/run
+    working_directory: ~/repo
 
     steps:
       - checkout
-
-      - run:
-          name: Install Docker client
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y docker.io
-
+      
       - run:
           name: Build Docker image for WebdriverIO
           command: docker build -t wdio-runner .
