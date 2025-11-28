@@ -30,7 +30,7 @@ jobs:
             ./src/config/wdio.browserstack.conf.ts
         continue-on-error: true
 
-        - name: Check run status
+      - name: Check run status
         if: always()
         run: |
           if [ -z "$STATUS" ]; then
