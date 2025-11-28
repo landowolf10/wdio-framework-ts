@@ -28,3 +28,89 @@ jobs:
             -e BROWSERSTACK_APP_ANDROID \
             wdio-runner \
             ./src/config/wdio.browserstack.conf.ts
+        continue-on-error: true
+
+        - name: Check run status
+        if: always()
+        run: |
+          if [ -z "$STATUS" ]; then
+            echo "STATUS=failure" >> $GITHUB_ENV
+          fi
+
+      - name: Prepare report folders
+        if: always()
+        run: |
+          TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
+          mkdir -p "reports-history/$TIMESTAMP"
+          cp -r reports/html/* "reports-history/$TIMESTAMP/"
+
+          rm -rf reports-history/latest
+          mkdir -p reports-history/latest
+          cp -r reports/html/* reports-history/latest/
+
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+
+      - name: Generate styled index.html
+        if: always()
+        run: |
+          INDEX_FILE="reports-history/index.html"
+
+          cat > $INDEX_FILE <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>Playwright Reports Dashboard</title>
+            <style>
+              body { font-family: Arial, sans-serif; background: #f4f6f8; margin:0; padding:20px; }
+              h1 { text-align:center; margin-bottom:20px; }
+              table { border-collapse: collapse; margin:auto; width:90%; background:white; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+              th, td { padding: 12px 16px; border-bottom:1px solid #ddd; text-align:center; }
+              th { background:#007acc; color:white; }
+              tr:hover { background:#f1f1f1; }
+              a { text-decoration:none; color:#007acc; font-weight:bold; }
+              .latest { background:#e8f4ff; font-weight:bold; }
+              .success { color:green; font-weight:bold; }
+              .failure { color:red; font-weight:bold; }
+            </style>
+          </head>
+          <body>
+            <h1>Historial de Playwright Reports</h1>
+            <table>
+              <thead>
+                <tr>
+                  <th>Run</th>
+                  <th>Branch</th>
+                  <th>Commit</th>
+                  <th>Status</th>
+                  <th>Reporte</th>
+                </tr>
+              </thead>
+              <tbody>
+          EOF
+
+          # Último reporte
+          echo "<tr class='latest'><td>Último</td><td>${BRANCH}</td><td>${COMMIT:0:7}</td><td class='$STATUS'>$STATUS</td><td><a href='latest/index.html'>Ver reporte</a></td></tr>" >> $INDEX_FILE
+
+          # Historial de reportes previos
+          for d in $(ls -d reports-history/*/ | grep -v 'latest' | sort -r); do
+            NAME=$(basename $d)
+            echo "<tr><td>$NAME</td><td>-</td><td>-</td><td>-</td><td><a href='$NAME/index.html'>Ver reporte</a></td></tr>" >> $INDEX_FILE
+          done
+
+          cat >> $INDEX_FILE <<'EOF'
+              </tbody>
+            </table>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: reports-history
+          publish_branch: gh-pages
+          keep_files: true
+          commit_message: "Update Playwright reports ${{ env.TIMESTAMP }}"
