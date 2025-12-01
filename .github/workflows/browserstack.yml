@@ -30,6 +30,16 @@ jobs:
             ./src/config/wdio.browserstack.conf.ts
         continue-on-error: true
 
+      - name: Install Allure CLI
+        run: |
+          sudo apt-add-repository ppa:qameta/allure -y
+          sudo apt-get update
+          sudo apt-get install -y allure
+
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results --clean -o allure-report
+
       - name: Check run status
         if: always()
         run: |
@@ -42,11 +52,11 @@ jobs:
         run: |
           TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
           mkdir -p "reports-history/$TIMESTAMP"
-          cp -r reports/html/* "reports-history/$TIMESTAMP/"
+          cp -r allure-report/* "reports-history/$TIMESTAMP/"
 
           rm -rf reports-history/latest
           mkdir -p reports-history/latest
-          cp -r reports/html/* reports-history/latest/
+          cp -r allure-report/* reports-history/latest/
 
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
