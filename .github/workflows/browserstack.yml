@@ -127,3 +127,4 @@ jobs:
           publish_branch: gh-pages
           keep_files: true
           commit_message: "Update WebdriverIO reports ${{ env.TIMESTAMP }}"
+          
