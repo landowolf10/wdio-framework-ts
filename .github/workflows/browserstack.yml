@@ -88,7 +88,7 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>Historial de Playwright Reports</h1>
+            <h1>WebdriverIO Reports</h1>
             <table>
               <thead>
                 <tr>
@@ -127,4 +127,3 @@ jobs:
           publish_branch: gh-pages
           keep_files: true
           commit_message: "Update WebdriverIO reports ${{ env.TIMESTAMP }}"
-          
